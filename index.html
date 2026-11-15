@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Earth Information Jukebox | NASA Space Apps Challenge 2026</title>
+  <meta name="description" content="A retro-futuristic Earth Information Jukebox translating 45 years of NASA Earth Information Center climate telemetry into an evocative documentary soundscape.">
+  <meta name="theme-color" content="#060913">
+
+  <!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet.js Dark Mode CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Cosmic Animated Background Particles -->
+  <div class="cosmic-canvas-bg" aria-hidden="true"></div>
+  <div class="starfield-twinkle" aria-hidden="true"></div>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-container" role="main">
+
+    <!-- 1. Header & NASA Space Apps Branding -->
+    <header class="jukebox-header">
+      <div class="brand-wrapper">
+        <div class="nasa-meatball-logo" aria-label="NASA Logo">
+          <span>NASA</span>
+        </div>
+        <div class="title-group">
+          <h1 class="app-title">
+            The Earth Information Jukebox
+            <span class="app-badge-year">2026 SPACE APPS</span>
+          </h1>
+          <p class="app-subtitle">45 Years of NASA Earth Information Center (EIC) Telemetry Orchestrated into Sound</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="svs-studio-btn" class="header-btn" style="border-color: rgba(56, 189, 248, 0.4); color: var(--nasa-cyan);" aria-haspopup="dialog" aria-label="Open NASA EIC SVS Sonification Studio">
+          <span>🌌</span> EIC SVS Studio
+        </button>
+        <button id="methodology-btn" class="header-btn" aria-haspopup="dialog" aria-label="Open NASA Data and Methodology Modal">
+          <span>🛰️</span> NASA Data & Resources
+        </button>
+        <button id="disclaimer-btn" class="header-btn" style="border-color: rgba(245, 158, 11, 0.4); color: var(--solar-amber);" aria-haspopup="dialog" aria-label="Open NASA Non-Endorsement Notice">
+          <span>⚖️</span> NASA Notice
+        </button>
+        <button id="keyboard-btn" class="header-btn" aria-haspopup="dialog" aria-label="Open Keyboard Shortcuts Modal">
+          <span>⌨️</span> Shortcuts
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Zero-Friction 3-Step Onboarding Quick-Start Banner -->
+    <section id="quick-start-banner" class="quick-start-banner" aria-label="Quick-Start Guide">
+      <div class="steps-list">
+        <div class="step-item">
+          <span class="step-num">1</span>
+          <span>Pick a Planet Record or click any spot on Earth</span>
+        </div>
+        <span class="step-arrow">→</span>
+        <div class="step-item">
+          <span class="step-num">2</span>
+          <span>Press Play to hear 45 years of NASA climate data</span>
+        </div>
+        <span class="step-arrow">→</span>
+        <div class="step-item">
+          <span class="step-num">3</span>
+          <span>Compare decades with Time Machine or solo stems in the DJ mixer</span>
+        </div>
+      </div>
+      <button id="dismiss-banner-btn" class="dismiss-banner-btn" aria-label="Dismiss Quick-Start Banner">✕</button>
+    </section>
+
+    <!-- 3. Balanced 2-Column Responsive Layout -->
+    <div class="jukebox-main-grid">
+
+      <!-- LEFT CONTROL COLUMN -->
+      <aside class="left-control-column">
+
+        <!-- Tactile Spinning Earth-Vinyl Jukebox Hero -->
+        <section class="glass-panel vinyl-hero-card" aria-label="Spinning Earth-Vinyl Player">
+          <div class="panel-title-bar" style="width: 100%;">
+            <h2 class="panel-title"><span>🪐</span> Tactile Earth Turntable</h2>
+            <span id="vinyl-status-badge" class="now-playing-badge">READY</span>
+          </div>
+
+          <!-- Turntable Platter Chassis & ToneArm -->
+          <div class="turntable-chassis" id="turntable-chassis">
+            <canvas id="earth-vinyl-canvas" class="earth-vinyl-canvas" width="320" height="320" title="Click and drag to scratch vinyl record"></canvas>
+            
+            <!-- SVG Vintage Tonearm -->
+            <svg id="turntable-tonearm" class="turntable-tonearm" viewBox="0 0 100 200" aria-hidden="true">
+              <!-- Pivot Base -->
+              <circle class="arm-base" cx="75" cy="25" r="18"/>
+              <circle class="arm-pivot" cx="75" cy="25" r="8"/>
+              <rect x="71" y="2" width="8" height="12" rx="2" fill="#64748B"/>
+              <!-- Curved Tonearm Wand -->
+              <path class="arm-wand" d="M 75 25 Q 60 90, 40 145 L 30 175" fill="none"/>
+              <!-- Headshell Cartridge -->
+              <rect class="arm-cartridge" x="20" y="168" width="16" height="24" rx="3" transform="rotate(-15, 28, 180)"/>
+              <!-- Diamond Stylus Needle -->
+              <line class="arm-stylus" x1="28" y1="192" x2="26" y2="200"/>
+            </svg>
+          </div>
+
+          <!-- Now Playing Info Block -->
+          <div class="now-playing-info">
+            <h3 id="now-playing-record-title" class="now-playing-title">The Breathing Planet</h3>
+            <p id="now-playing-subtitle" class="now-playing-sub">Global Surface Temperature Anomaly & CO₂ Pulse</p>
+            <p id="now-playing-genre" class="now-playing-genre">Ambient Atmospheric Drone & Cosmic Chords • D Major / Lydian</p>
+          </div>
+
+          <!-- Turntable RPM Speed Bar -->
+          <div class="turntable-speed-bar" role="group" aria-label="Playback Speed">
+            <span class="speed-label">TEMPO:</span>
+            <button class="speed-btn active" data-speed="1" aria-label="1x Speed (33 RPM)">1x (33 RPM)</button>
+            <button class="speed-btn" data-speed="2" aria-label="2x Speed (45 RPM)">2x (45 RPM)</button>
+            <button class="speed-btn" data-speed="4" aria-label="4x Speed (78 RPM)">4x (78 RPM)</button>
+          </div>
+        </section>
+
+        <!-- Master Transport Controls -->
+        <section class="glass-panel transport-card" aria-label="Transport Controls">
+          <div class="scrubber-header">
+            <span class="scrubber-label">45-YEAR TELEMETRY SCRUBBER</span>
+            <span id="scrubber-current-time" class="scrubber-current-time">JAN 1981</span>
+          </div>
+
+          <!-- Timeline Slider (0 to 539 months) -->
+          <input type="range" id="timeline-scrubber" class="timeline-slider-range" min="0" max="539" value="0" step="1" aria-label="Timeline Month Scrubber">
+
+          <div class="decade-markers" aria-hidden="true">
+            <span>1981</span>
+            <span>1990</span>
+            <span>2000</span>
+            <span>2010</span>
+            <span>2020</span>
+            <span>2025</span>
+          </div>
+
+          <!-- Primary Transport Buttons -->
+          <div class="primary-transport-buttons">
+            <button id="prev-decade-btn" class="transport-btn" title="Jump back 10 years" aria-label="Jump back 10 years">
+              <span>⏮ -10y</span>
+            </button>
+            
+            <button id="play-pause-btn" class="play-pause-btn" aria-label="Play or Pause Sonification (Spacebar)" title="Play / Pause (Space)">
+              <span id="play-icon">▶</span>
+              <span id="pause-icon" style="display: none;">❚❚</span>
+            </button>
+
+            <button id="next-decade-btn" class="transport-btn" title="Jump forward 10 years" aria-label="Jump forward 10 years">
+              <span>+10y ⏭</span>
+            </button>
+
+            <button id="loop-toggle-btn" class="transport-btn active" title="Toggle Continuous Looping" aria-label="Toggle Looping">
+              <span>🔁 Loop</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Special Modes Control Panel -->
+        <section class="glass-panel special-modes-card" aria-label="Special Sonification Modes">
+          <div class="panel-title-bar">
+            <h2 class="panel-title"><span>✨</span> Special Sonification Modes</h2>
+          </div>
+
+          <div class="mode-buttons-row">
+            <button id="ab-mode-toggle" class="mode-toggle-btn" title="Compare 1985 baseline vs 2025 reality back-to-back" aria-label="Toggle 1985 vs 2025 A/B Time Machine">
+              <span class="mode-icon">⏳</span>
+              <span>1985 vs 2025 Time Machine</span>
+            </button>
+
+            <button id="eyes-closed-toggle" class="mode-toggle-btn" title="Stereo temporal panning + spoken milestone narration" aria-label="Toggle Eyes-Closed Museum Audio Guide">
+              <span class="mode-icon">🎧</span>
+              <span>Eyes-Closed Audio Guide</span>
+            </button>
+
+            <button id="pixel-sonifier-toggle" class="mode-toggle-btn" title="Map satellite frame colors to harmonic oscillator frequencies" aria-label="Toggle Visual Frame Sonifier">
+              <span class="mode-icon">🛰️</span>
+              <span>Visual Frame Sonifier</span>
+            </button>
+          </div>
+
+          <!-- A/B Time Machine Phase Indicator -->
+          <div id="ab-phase-indicator" class="ab-phase-indicator" aria-live="polite">
+            <span class="ab-tag tag-a">TRACK A: 1985 BASELINE</span>
+          </div>
+        </section>
+
+        <!-- 4-Channel DJ Stem Mixer -->
+        <section id="stem-mixer" class="glass-panel stem-mixer-card" aria-label="4-Channel DJ Stem Mixer">
+          <div class="panel-title-bar">
+            <h2 class="panel-title"><span>🎚️</span> 4-Channel Climate Stem Mixer</h2>
+            <span class="code-pill">D-Lydian Engine</span>
+          </div>
+
+          <div class="stem-channels-grid">
+            <!-- Channel 1: Temperature (Analog Lead) -->
+            <div class="stem-channel">
+              <div class="stem-header">
+                <span class="stem-name">TEMP (T2M)</span>
+                <span class="stem-role">Synth Lead</span>
+              </div>
+              <div id="vu-meter-temp" class="vu-meter-column" aria-label="Temperature Stem VU Meter">
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+              </div>
+              <div class="stem-fader-container">
+                <input type="range" class="stem-fader" data-stem="temp" min="0" max="1" step="0.01" value="0.85" aria-label="Temperature Volume">
+              </div>
+              <div class="stem-actions">
+                <button class="stem-mute-btn" data-stem="temp" title="Mute [1]" aria-label="Mute Temperature Stem">M</button>
+                <button class="stem-solo-btn" data-stem="temp" title="Solo" aria-label="Solo Temperature Stem">S</button>
+              </div>
+            </div>
+
+            <!-- Channel 2: Precipitation (Marimba Drops) -->
+            <div class="stem-channel">
+              <div class="stem-header">
+                <span class="stem-name">PRECIP</span>
+                <span class="stem-role">Rain Marimba</span>
+              </div>
+              <div id="vu-meter-precip" class="vu-meter-column" aria-label="Precipitation Stem VU Meter">
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+              </div>
+              <div class="stem-fader-container">
+                <input type="range" class="stem-fader" data-stem="precip" min="0" max="1" step="0.01" value="0.80" aria-label="Precipitation Volume">
+              </div>
+              <div class="stem-actions">
+                <button class="stem-mute-btn" data-stem="precip" title="Mute [2]" aria-label="Mute Precipitation Stem">M</button>
+                <button class="stem-solo-btn" data-stem="precip" title="Solo" aria-label="Solo Precipitation Stem">S</button>
+              </div>
+            </div>
+
+            <!-- Channel 3: Solar Insolation (Cosmic Pad) -->
+            <div class="stem-channel">
+              <div class="stem-header">
+                <span class="stem-name">SOLAR FLUX</span>
+                <span class="stem-role">Cosmic Pad</span>
+              </div>
+              <div id="vu-meter-solar" class="vu-meter-column" aria-label="Solar Flux Stem VU Meter">
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+              </div>
+              <div class="stem-fader-container">
+                <input type="range" class="stem-fader" data-stem="solar" min="0" max="1" step="0.01" value="0.75" aria-label="Solar Volume">
+              </div>
+              <div class="stem-actions">
+                <button class="stem-mute-btn" data-stem="solar" title="Mute [3]" aria-label="Mute Solar Stem">M</button>
+                <button class="stem-solo-btn" data-stem="solar" title="Solo" aria-label="Solo Solar Stem">S</button>
+              </div>
+            </div>
+
+            <!-- Channel 4: Extreme Alert (Crystal Bell) -->
+            <div class="stem-channel">
+              <div class="stem-header">
+                <span class="stem-name">ALERT</span>
+                <span class="stem-role">Crystal Bell</span>
+              </div>
+              <div id="vu-meter-alert" class="vu-meter-column" aria-label="Alert Stem VU Meter">
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+                <div class="vu-segment"></div>
+              </div>
+              <div class="stem-fader-container">
+                <input type="range" class="stem-fader" data-stem="alert" min="0" max="1" step="0.01" value="0.90" aria-label="Alert Volume">
+              </div>
+              <div class="stem-actions">
+                <button class="stem-mute-btn" data-stem="alert" title="Mute [4]" aria-label="Mute Alert Stem">M</button>
+                <button class="stem-solo-btn" data-stem="alert" title="Solo" aria-label="Solo Alert Stem">S</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- RIGHT TELEMETRY & VISUALIZATION COLUMN -->
+      <section class="right-telemetry-column">
+
+        <!-- Live Telemetry HUD: 4 Glassmorphic KPI Cards -->
+        <div class="telemetry-hud-grid" aria-label="Live Climate Telemetry HUD">
+          <!-- KPI 1: Active Time -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">ACTIVE TIME</span>
+              <span class="kpi-icon">📅</span>
+            </div>
+            <span id="hud-time-val" class="kpi-value">JAN 1981</span>
+            <span id="hud-time-badge" class="kpi-badge badge-cyan">Month 1 / 540</span>
+          </div>
+
+          <!-- KPI 2: Temperature & Anomaly -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">SURFACE TEMP</span>
+              <span class="kpi-icon">🌡️</span>
+            </div>
+            <span id="hud-temp-val" class="kpi-value">+12.1°C</span>
+            <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+              <span id="hud-temp-anomaly" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary);">-0.12°C vs baseline</span>
+              <span id="hud-temp-badge" class="kpi-badge badge-cyan">BASELINE NORM</span>
+            </div>
+          </div>
+
+          <!-- KPI 3: Precipitation -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">PRECIPITATION</span>
+              <span class="kpi-icon">🌧️</span>
+            </div>
+            <span id="hud-precip-val" class="kpi-value">2.6 mm/d</span>
+            <span id="hud-precip-badge" class="kpi-badge badge-emerald">~79 mm/month</span>
+          </div>
+
+          <!-- KPI 4: Solar Insolation & CO2 -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">SOLAR FLUX & CO₂</span>
+              <span class="kpi-icon">☀️</span>
+            </div>
+            <span id="hud-solar-val" class="kpi-value">17.8 MJ/m²</span>
+            <span id="hud-solar-badge" class="kpi-badge badge-amber">CO₂: <span id="hud-co2-val">340.2 ppm</span></span>
+          </div>
+        </div>
+
+        <!-- Live "What You Are Hearing" Decoder Pill -->
+        <div id="hearing-decoder-pill" class="hearing-decoder-card" aria-live="polite">
+          <span class="decoder-icon-pulse">🔊</span>
+          <div class="decoder-text-content">
+            <span class="decoder-label">LIVE SONIFICATION DECODER:</span>
+            <p id="decoder-text" class="decoder-text">Warm mid-register synth lead (12.1°C) + Gentle marimba arpeggio + Soft ambient pad</p>
+          </div>
+          <div id="decoder-wave-bar" class="decoder-wave-bar"></div>
+        </div>
+
+        <!-- Interactive Planet Record Selector -->
+        <section class="glass-panel" aria-label="Curated Planet Records">
+          <div class="panel-title-bar">
+            <h2 class="panel-title"><span>🪐</span> Planet Records & NASA EIC SVS Tracks</h2>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button id="custom-coord-btn" class="header-btn" style="font-size: 0.75rem;">
+                <span>📍</span> Custom Lat/Lon
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Filter Tabs: All, 45-Year Climate, NASA EIC/SVS Visual Studio -->
+          <div class="record-tabs-bar" role="tablist" aria-label="Record Categories">
+            <button class="record-tab-btn active" data-tab="all" role="tab" aria-selected="true">All Planet Tracks (12)</button>
+            <button class="record-tab-btn" data-tab="climate" role="tab" aria-selected="false">45-Year Climate Telemetry (4)</button>
+            <button class="record-tab-btn" data-tab="svs" role="tab" aria-selected="false">NASA EIC / SVS Visual Studio (8)</button>
+          </div>
+
+          <div id="featured-records-container" class="featured-records-grid">
+            <!-- Dynamically populated with Curated NASA Records & SVS Datasets -->
+          </div>
+        </section>
+
+        <!-- "Your Climate Lifetime Soundtrack" Builder Card -->
+        <section class="glass-panel lifetime-soundtrack-card" aria-label="Your Climate Lifetime Soundtrack">
+          <div class="panel-title-bar">
+            <h2 class="panel-title"><span>🎵</span> Your Climate Lifetime Soundtrack</h2>
+            <span class="code-pill">1981–2025</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-secondary);">
+            Enter the year you were born to hear how Earth's vital signs evolved throughout your lifetime:
+          </p>
+          
+          <div class="lifetime-builder-form">
+            <div class="input-group">
+              <label for="birth-year-input" class="input-label">Birth Year:</label>
+              <input type="number" id="birth-year-input" class="year-input" min="1981" max="2025" value="1995">
+            </div>
+            <button id="generate-lifetime-btn" class="generate-btn" aria-label="Play My Lifetime Soundtrack">
+              <span>▶</span> Play My Lifetime Soundtrack
+            </button>
+          </div>
+
+          <div id="lifetime-delta-badge" class="lifetime-delta-badge">
+            <span>🔥</span>
+            <span id="lifetime-delta-text">Earth has warmed +1.18°C since you were born in 1995.</span>
+          </div>
+        </section>
+
+        <!-- NASA GIBS Satellite Imagery Layer & Chart.js Timeline Card -->
+        <section class="glass-panel map-timeline-combo-card" aria-label="NASA Satellite Imagery & Timeline">
+          <div class="panel-title-bar">
+            <h2 class="panel-title"><span>🛰️</span> NASA GIBS Satellite Layer & 45-Year Timeline</h2>
+            <div class="map-controls-bar">
+              <label for="map-layer-select" class="scrubber-label" style="font-size: 0.75rem;">LAYER:</label>
+              <select id="map-layer-select" class="map-layer-selector" aria-label="Select NASA GIBS Satellite Layer">
+                <option value="modis">MODIS Terra True Color (GIBS)</option>
+                <option value="temperature">AIRS Surface Air Temp (GIBS)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Leaflet Dark Map with NASA GIBS WMTS Tiles -->
+          <div id="nasa-satellite-map" class="nasa-satellite-map-container" title="Click anywhere on the globe to query NASA POWER satellite archives"></div>
+
+          <!-- Chart.js 45-Year Timeline Chart with Dynamic Scrubber Line -->
+          <div class="timeline-chart-wrapper">
+            <canvas id="timeline-chart-canvas" aria-label="NASA Climate Timeline Graph"></canvas>
+          </div>
+        </section>
+
+      </section>
+
+    </div>
+
+    <!-- Footer & Space Apps Credits -->
+    <footer class="jukebox-footer">
+      <p>Built for the 2026 NASA Space Apps Challenge: <strong>"The Earth Information Jukebox"</strong></p>
+      
+      <!-- Official NASA Space Apps Non-Endorsement & Data Use Disclaimer -->
+      <p class="nasa-disclaimer-text" style="font-size: 0.74rem; color: #FCD34D; max-width: 960px; margin: 0.5rem auto; line-height: 1.5; opacity: 0.9; background: rgba(245, 158, 11, 0.08); padding: 0.5rem 0.85rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.25);">
+        ⚖️ <strong>NASA Disclaimer:</strong> NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites. For non-U.S. Government websites, participants must comply with any data use parameters of that specific website.
+      </p>
+
+      <div class="footer-links">
+        <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener" class="footer-link">NASA POWER API</a>
+        <span>•</span>
+        <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener" class="footer-link">NASA GIBS WMTS</a>
+        <span>•</span>
+        <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener" class="footer-link">NASA GISTEMP Anomaly Baseline</a>
+        <span>•</span>
+        <a href="https://earth.gov/" target="_blank" rel="noopener" class="footer-link">Earth Information Center (EIC)</a>
+        <span>•</span>
+        <a href="https://svs.gsfc.nasa.gov/gallery/earth-information-center/" target="_blank" rel="noopener" class="footer-link">EIC SVS Content Database</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- 4. Eyes-Closed Museum Sanctuary Overlay -->
+  <div id="eyes-closed-overlay" class="eyes-closed-overlay" role="dialog" aria-modal="true" aria-label="Eyes-Closed Museum Sanctuary">
+    <div class="eyes-closed-card">
+      <div class="sanctuary-icon">🌌</div>
+      <h2 class="eyes-closed-title">Eyes-Closed Museum Audio Sanctuary</h2>
+      <div id="eyes-closed-year" class="eyes-closed-year-display">1981 JAN</div>
+      <p id="eyes-closed-subtitle" class="eyes-closed-subtitle">
+        Spatial stereo depth active: Historical decades pan gently to your left ear, modern decades pan to your right.
+      </p>
+      
+      <div class="spatial-panning-indicator">
+        <span>LEFT (1980s)</span>
+        <div class="panning-bar"></div>
+        <span>RIGHT (2020s)</span>
+      </div>
+
+      <button id="exit-eyes-closed-btn" class="exit-sanctuary-btn" aria-label="Exit Audio Sanctuary (Escape)">
+        Exit Audio Sanctuary (Esc)
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. NASA Data & Methodology Modal -->
+  <div id="methodology-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-methodology-title">
+    <div class="modal-window" style="max-width: 840px;">
+      <div class="modal-header">
+        <h3 id="modal-methodology-title" class="modal-title"><span>🛰️</span> NASA Earth Science Data & Sonification Methodology</h3>
+        <button id="close-methodology-btn" class="close-modal-btn" aria-label="Close Modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Official NASA Non-Endorsement Notice -->
+        <div class="nasa-disclaimer-alert">
+          <span style="font-size: 1.25rem;">⚖️</span>
+          <div>
+            <strong>Official NASA Space Apps Challenge Notice:</strong><br>
+            NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites. For non-U.S. Government websites, participants must comply with any data use parameters of that specific website.
+          </div>
+        </div>
+
+        <div>
+          <h4 class="methodology-section-title">1. Real NASA Data Sources</h4>
+          <p>
+            The Earth Information Jukebox retrieves monthly climate observations directly from the <strong>NASA Prediction Of Worldwide Energy Resources (POWER) API</strong> and <strong>NASA EOSDIS GIBS (Global Imagery Browse Services)</strong>:
+          </p>
+          <ul style="margin-left: 1.25rem; margin-top: 0.4rem;">
+            <li><strong>T2M (°C):</strong> 2-Meter Surface Skin Temperature from NASA MERRA-2 assimilation model and AIRS sensor on the Aqua satellite.</li>
+            <li><strong>PRECTOTCORR (mm/day):</strong> Corrected Precipitation Rate combining GPCP and satellite infrared/microwave precipitation estimates.</li>
+            <li><strong>ALLSKY_SFC_SW_DWN (MJ/m²/day):</strong> All Sky Surface Shortwave Downward Irradiance derived from CERES, FLASHFlux, and MODIS satellites.</li>
+            <li><strong>GISTEMP Climatological Baseline:</strong> 1981–2010 thirty-year baseline normals calculated per month to determine accurate thermal anomalies.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="methodology-section-title">2. Live API Endpoint Format</h4>
+          <p class="code-pill">
+            https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=T2M,PRECTOTCORR,ALLSKY_SFC_SW_DWN&community=RE&longitude={lon}&latitude={lat}&start=1981&end=2025&format=JSON
+          </p>
+          <p style="margin-top: 0.4rem;">
+            When users click anywhere on the interactive map or enter coordinates, this REST endpoint fetches real 45-year monthly data points.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="methodology-section-title">3. Sonification Architecture (Musical Harmony)</h4>
+          <p>
+            Rather than abrasive noise, climate data is harmonized into an evocative <strong>D Major Pentatonic / Lydian scale (D, E, F#, G#, A, B, C#)</strong> with gentle stereo reverb and delay:
+          </p>
+          <ul style="margin-left: 1.25rem; margin-top: 0.4rem;">
+            <li><strong>Surface Temperature:</strong> Mapped to an Analog Lead Synth whose pitch ascends and lowpass filter frequency opens (400 Hz to 4,200 Hz) as temperatures increase.</li>
+            <li><strong>Precipitation:</strong> Mapped to Acoustic Marimba arpeggios where rainfall intensity controls note density and ping-pong stereo shimmer.</li>
+            <li><strong>Solar Insolation:</strong> Drives the harmonic chord richness and envelope swell of a lush cosmic synthesizer pad.</li>
+            <li><strong>Climate Anomaly Alert:</strong> Triggers a crystal bell chime whenever regional warming surpasses +1.5°C above baseline or historic deluges occur.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="methodology-section-title">4. NASA Earth Information Center (EIC) & SVS Content Database</h4>
+          <p>
+            The Jukebox incorporates visual and spatial datasets from the official <strong>NASA Scientific Visualization Studio (SVS)</strong> for the Earth Information Center:
+          </p>
+          <table class="catalog-table">
+            <thead>
+              <tr>
+                <th>Resource & SVS ID</th>
+                <th>Scientific Theme</th>
+                <th>Acoustic & Sonification Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/gallery/earth-information-center/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">EIC Content Database ↗</a></td>
+                <td>EIC Dashboards</td>
+                <td>Primary visual and video assets for audio processing algorithms.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/13786/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">Data Sonification: Caldwell 73 (SVS 13786) ↗</a></td>
+                <td>NASA Sonification Framework</td>
+                <td>Conceptual model mapping luminosity to volume and spatial coordinates to pitch.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/5313/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">Change in Night Lights 2012–2023 (SVS 5313) ↗</a></td>
+                <td>Urban Illumination</td>
+                <td>High-contrast luminance mapping intensity to playback tempo (BPM) and volume.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/3912/#media_group_349716" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">Sea Surface Currents & Temp (SVS 3912) ↗</a></td>
+                <td>Oceanic Circulation</td>
+                <td>Fluid movement and thermal gradients converted into complex, evolving soundscapes.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/5669/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">GEOS Aerosols (SVS 5669) ↗</a></td>
+                <td>Smoke, Dust, Salt, Sulfate</td>
+                <td>Multi-track layering assigning distinct audio textures to categorized particles.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/5533/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">Air Quality Model Runs (SVS 5533) ↗</a></td>
+                <td>Atmospheric Chemistry</td>
+                <td>Downloadable high-res frames mapping color palettes & pixel densities to sound profiles.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/5425/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">Perpetual Ocean 2 (SVS 5425) ↗</a></td>
+                <td>Western Boundary Currents</td>
+                <td>High-contrast Gulf Stream & Kuroshio flows aligned with musical rhythms and scales.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/5196/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">DYAMOND Global Carbon Dioxide (SVS 5196) ↗</a></td>
+                <td>Global CO₂ Plumes</td>
+                <td>Primary input driving baseline synthesizer drone and harmonic tension.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/5011/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">ISS Lightning Events 2017–2023 (SVS 5011) ↗</a></td>
+                <td>Spaceborne Lightning</td>
+                <td>Punctuated sonification triggering percussive strikes and crystal alerts on flashes.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/4960/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">Atmospheric River 3D View (SVS 4960) ↗</a></td>
+                <td>Moisture Density Corridors</td>
+                <td>Extracting moisture density into cascading marimba delay and stereo swells.</td>
+              </tr>
+              <tr>
+                <td><a href="https://svs.gsfc.nasa.gov/4950/" target="_blank" rel="noopener" style="color: var(--nasa-cyan); font-weight: bold;">GEDI Forest Height (SVS 4950) ↗</a></td>
+                <td>Canopy Elevation (0–60m)</td>
+                <td>Color spectrum mapping forest elevation to pitch registers and wooden marimba rhythms.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NASA EIC SVS Visual Sonification Studio Modal (Caldwell 73 Framework) -->
+  <div id="svs-studio-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-svs-title">
+    <div class="modal-window svs-studio-modal-window">
+      <div class="modal-header">
+        <h3 id="modal-svs-title" class="modal-title"><span>🌌</span> NASA EIC / SVS Visual Sonification Studio</h3>
+        <button id="close-svs-btn" class="close-modal-btn" aria-label="Close Modal">✕</button>
+      </div>
+      <div class="modal-body svs-studio-body">
+        <div class="nasa-disclaimer-alert">
+          <span>ℹ️</span>
+          <div>
+            <strong>NASA SVS Conceptual Framework (Caldwell 73 / SVS 13786):</strong>
+            Visual attributes (luminosity → volume, vertical coordinate → pitch, color → timbre) are translated algorithmically into sound in real time.
+          </div>
+        </div>
+
+        <div class="svs-controls-header">
+          <label for="svs-dataset-select" class="scrubber-label" style="font-size: 0.75rem;">SVS DATASET:</label>
+          <select id="svs-dataset-select" class="svs-dataset-selector" aria-label="Select NASA EIC SVS Dataset">
+            <option value="5196">DYAMOND Global Carbon Dioxide (SVS 5196)</option>
+            <option value="5011">ISS Spaceborne Lightning Events (SVS 5011)</option>
+            <option value="5425">Perpetual Ocean: Western Boundary Currents (SVS 5425 / 3912)</option>
+            <option value="4950">GEDI Global Forest Canopy Height (SVS 4950)</option>
+            <option value="5313">Change in Night Lights 2012–2023 (SVS 5313)</option>
+            <option value="5669">GEOS Aerosols: Smoke, Dust, Salt, Sulfate (SVS 5669)</option>
+            <option value="4960">3D Atmospheric River Moisture Stream (SVS 4960)</option>
+            <option value="13786">Data Sonification: Caldwell 73 Framework (SVS 13786)</option>
+          </select>
+          <button id="toggle-scanline-btn" class="header-btn" style="background: rgba(56, 189, 248, 0.2);">
+            <span>▶</span> Run Scanline
+          </button>
+          <button id="trigger-lightning-btn" class="lightning-strike-btn" title="Simulate ISS Spaceborne Lightning Event">
+            <span>⚡</span> Trigger Lightning Strike
+          </button>
+        </div>
+
+        <!-- SVS Visualization Canvas with Caldwell 73 Radar Scanline -->
+        <div class="svs-visualizer-container">
+          <canvas id="svs-visualizer-canvas" class="svs-canvas" width="760" height="260"></canvas>
+          <div id="caldwell-scanline" class="caldwell-scanline"></div>
+        </div>
+
+        <!-- Live Telemetry Readout Grid -->
+        <div class="svs-readout-grid">
+          <div class="svs-readout-card">
+            <span class="svs-readout-label">Y POSITION → PITCH (CALDWELL 73)</span>
+            <span id="svs-readout-pitch" class="svs-readout-val">D4 (Mid Register)</span>
+          </div>
+          <div class="svs-readout-card">
+            <span class="svs-readout-label">LUMINOSITY → AMPLITUDE / VOLUME</span>
+            <span id="svs-readout-lum" class="svs-readout-val">74% Intensity</span>
+          </div>
+          <div class="svs-readout-card">
+            <span class="svs-readout-label">COLOR SPECTRUM → TIMBRE LAYER</span>
+            <span id="svs-readout-timbre" class="svs-readout-val" style="color: var(--nasa-cyan);">Oceanic Moisture Flux</span>
+          </div>
+        </div>
+
+        <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">
+          Official SVS Reference: <a id="svs-external-link" href="https://svs.gsfc.nasa.gov/5196/" target="_blank" rel="noopener" style="color: var(--nasa-cyan);">NASA Scientific Visualization Studio Entry ↗</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated NASA Non-Endorsement Notice Modal -->
+  <div id="disclaimer-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-disclaimer-title">
+    <div class="modal-window" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 id="modal-disclaimer-title" class="modal-title"><span>⚖️</span> NASA Notice & Terms of Use</h3>
+        <button id="close-disclaimer-btn" class="close-modal-btn" aria-label="Close Modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="nasa-disclaimer-alert" style="margin-bottom: 0.5rem;">
+          <span style="font-size: 1.4rem;">⚖️</span>
+          <div>
+            <strong>NASA Non-Endorsement Statement:</strong><br>
+            NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites. For non-U.S. Government websites, participants must comply with any data use parameters of that specific website.
+          </div>
+        </div>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+          All Earth observation telemetry, satellite imagery, and model simulations utilized in The Earth Information Jukebox are provided freely and openly by the National Aeronautics and Space Administration (NASA), the Earth Information Center (EIC), and the Goddard Space Flight Center Scientific Visualization Studio (SVS).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Keyboard Shortcuts Modal -->
+  <div id="keyboard-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-keyboard-title">
+    <div class="modal-window" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="modal-keyboard-title" class="modal-title"><span>⌨️</span> Keyboard Controls</h3>
+        <button id="close-keyboard-btn" class="close-modal-btn" aria-label="Close Modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <table class="shortcuts-table">
+          <tbody>
+            <tr>
+              <td><span class="kbd-badge">Space</span></td>
+              <td>Play / Pause Sonification</td>
+            </tr>
+            <tr>
+              <td><span class="kbd-badge">←</span> / <span class="kbd-badge">→</span></td>
+              <td>Scrub Timeline (Month by Month)</td>
+            </tr>
+            <tr>
+              <td><span class="kbd-badge">Shift</span> + <span class="kbd-badge">←</span> / <span class="kbd-badge">→</span></td>
+              <td>Jump 1 Year Backward / Forward</td>
+            </tr>
+            <tr>
+              <td><span class="kbd-badge">1</span>, <span class="kbd-badge">2</span>, <span class="kbd-badge">3</span>, <span class="kbd-badge">4</span></td>
+              <td>Mute / Unmute Stem Channels 1 to 4</td>
+            </tr>
+            <tr>
+              <td><span class="kbd-badge">A</span></td>
+              <td>Toggle 1985 vs 2025 A/B Time Machine</td>
+            </tr>
+            <tr>
+              <td><span class="kbd-badge">E</span></td>
+              <td>Toggle Eyes-Closed Museum Audio Guide</td>
+            </tr>
+            <tr>
+              <td><span class="kbd-badge">Esc</span></td>
+              <td>Close Modals / Exit Eyes-Closed View</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Custom Coordinate Input Modal -->
+  <div id="coord-input-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-coord-title">
+    <div class="modal-window" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 id="modal-coord-title" class="modal-title"><span>📍</span> Enter Custom Coordinates</h3>
+        <button id="close-coord-btn" class="close-modal-btn" aria-label="Close Modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.84rem; color: var(--text-secondary);">
+          Query NASA POWER satellite archives for any location on Earth:
+        </p>
+        <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+          <div style="flex: 1;">
+            <label for="input-lat" class="input-label" style="display: block; margin-bottom: 0.25rem;">Latitude (-90 to 90):</label>
+            <input type="number" id="input-lat" class="year-input" style="width: 100%;" step="0.01" value="28.61" placeholder="e.g. 28.61">
+          </div>
+          <div style="flex: 1;">
+            <label for="input-lon" class="input-label" style="display: block; margin-bottom: 0.25rem;">Longitude (-180 to 180):</label>
+            <input type="number" id="input-lon" class="year-input" style="width: 100%;" step="0.01" value="77.20" placeholder="e.g. 77.20">
+          </div>
+        </div>
+        <button id="submit-coords-btn" class="generate-btn" style="margin-top: 0.75rem; width: 100%; justify-content: center;">
+          Fetch NASA Satellite Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Toast Notifications Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Verified Third-Party Libraries (Tone.js, Leaflet.js, Chart.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Application Bundle (Works universally with both file:// protocol and http://) -->
+  <script src="js/bundle.js"></script>
+
+</body>
+</html>
